@@ -1,5 +1,3 @@
-import React from 'react';
-
 const OfferNotLoggedPage = () => {
   return (
     <div className="page">

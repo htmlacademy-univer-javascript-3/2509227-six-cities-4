@@ -1,5 +1,3 @@
-import React from 'react';
-
 const OfferPage = () => {
   return (
     <div className="page">

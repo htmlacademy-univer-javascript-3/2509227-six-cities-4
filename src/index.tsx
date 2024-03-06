@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/App.tsx';
+import { IOffer } from './types.ts';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const offers = [
+const offers:IOffer[] = [
   {
     id: 1,
     title: 'Beautiful & luxurious apartment at great location',

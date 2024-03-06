@@ -1,6 +1,7 @@
-import React from 'react';
+import { FC } from "react";
+import { IOffer } from "../types";
 
-const OfferCard = ({ offer }) => {
+const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
   return (
     <article className="cities__card place-card">
       {offer.isPremium && (

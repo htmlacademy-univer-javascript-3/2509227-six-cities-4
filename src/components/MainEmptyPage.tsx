@@ -1,5 +1,3 @@
-import React from 'react';
-
 const MainEmptyPage = () => {
   return (
     <div className="page page--gray page--main">
