@@ -7,4 +7,5 @@ export interface IOffer {
   isBookmarked: boolean;
   image: string;
   isPremium: boolean;
+  coords: [number, number];
 }

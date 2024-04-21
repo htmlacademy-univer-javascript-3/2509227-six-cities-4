@@ -1,6 +1,7 @@
 import OfferCard from './OfferCard.tsx';
 import { FC } from 'react';
 import { IOffer } from '../types';
+import MapComponent from './MapComponent';
 
 const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
   offersCount,
@@ -125,7 +126,7 @@ const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
               </div>
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map"></section>
+              <MapComponent offers={offers} />
             </div>
           </div>
         </div>
