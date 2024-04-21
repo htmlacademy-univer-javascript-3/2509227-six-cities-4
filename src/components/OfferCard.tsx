@@ -1,5 +1,7 @@
 import { FC } from "react";
 import { IOffer } from "../types";
+import { Link } from 'react-router-dom'; 
+
 
 const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
   return (
@@ -10,7 +12,7 @@ const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
         </div>
       )}
       <div className="cities__image-wrapper place-card__image-wrapper">
-        <a href="#">
+        <Link to={`/offer/${offer.id}`}>
           <img
             className="place-card__image"
             src={offer.image}
@@ -18,7 +20,7 @@ const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
             height="200"
             alt="Place image"
           />
-        </a>
+        </Link>
       </div>
       <div className="place-card__info">
         <div className="place-card__price-wrapper">
