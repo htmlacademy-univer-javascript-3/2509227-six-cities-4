@@ -1,8 +1,11 @@
 import OfferCard from './OfferCard.tsx';
-import { FC } from "react";
-import { IOffer } from "../types";
+import { FC } from 'react';
+import { IOffer } from '../types';
 
-const HomePage:FC<{offers: IOffer[], offersCount: number}> =  ({ offersCount, offers }) => {
+const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
+  offersCount,
+  offers,
+}) => {
   return (
     <div className="page page--gray page--main">
       <header className="header">
