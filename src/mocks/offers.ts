@@ -10,6 +10,7 @@ export const mockOffers: IOffer[] = [
     isBookmarked: false,
     image: 'markup/img/apartment-01.jpg',
     isPremium: true,
+    coords: [52.3909553943508, 4.85309666406198],
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export const mockOffers: IOffer[] = [
     isBookmarked: true,
     image: 'markup/img/room.jpg',
     isPremium: false,
+    coords: [52.3609553943508, 4.85309666406198],
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const mockOffers: IOffer[] = [
     isBookmarked: false,
     image: 'markup/img/apartment-02.jpg',
     isPremium: false,
+    coords: [52.3909553943508, 4.929309666406198],
   },
   {
     id: 4,
@@ -40,5 +43,6 @@ export const mockOffers: IOffer[] = [
     isBookmarked: false,
     image: 'markup/img/apartment-03.jpg',
     isPremium: true,
+    coords: [52.3809553943508, 4.939309666406198],
   },
 ];
