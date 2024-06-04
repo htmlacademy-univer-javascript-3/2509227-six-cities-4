@@ -1,9 +1,31 @@
 import React from 'react';
 import { IOffer } from '../types';
-import OfferCard from './OfferCard';
-import CommentForm from './CommentForm';
+import ReviewsList from './ReviewsList';
+import MapComponent from './MapComponent';
+import NearOffersList from './NearOffersList';
 
 const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
+  const reviews = [
+    {
+      id: 1,
+      author: 'Max',
+      avatar: 'img/avatar-max.jpg',
+      rating: 4,
+      text: 'A quiet cozy and picturesque that hides behind a river by the unique lightness of Amsterdam.',
+      date: '2019-04-24',
+      displayDate: 'April 2019',
+    },
+    {
+      id: 2,
+      author: 'Max',
+      avatar: 'img/avatar-max.jpg',
+      rating: 5,
+      text: 'A quiet cozy and picturesque that hides behind a river by the unique lightness of Amsterdam.',
+      date: '2019-05-24',
+      displayDate: 'May 2019',
+    },
+  ];
+
   return (
     <div className="page">
       <header className="header">
@@ -174,47 +196,10 @@ const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
                   </p>
                 </div>
               </div>
-              <section className="offer__reviews reviews">
-                <h2 className="reviews__title">
-                  Reviews &middot; <span className="reviews__amount">1</span>
-                </h2>
-                <ul className="reviews__list">
-                  <li className="reviews__item">
-                    <div className="reviews__user user">
-                      <div className="reviews__avatar-wrapper user__avatar-wrapper">
-                        <img
-                          className="reviews__avatar user__avatar"
-                          src="img/avatar-max.jpg"
-                          width="54"
-                          height="54"
-                          alt="Reviews avatar"
-                        />
-                      </div>
-                      <span className="reviews__user-name">Max</span>
-                    </div>
-                    <div className="reviews__info">
-                      <div className="reviews__rating rating">
-                        <div className="reviews__stars rating__stars">
-                          <span style={{ width: '80%' }}></span>
-                          <span className="visually-hidden">Rating</span>
-                        </div>
-                      </div>
-                      <p className="reviews__text">
-                        A quiet cozy and picturesque that hides behind a a river
-                        by the unique lightness of Amsterdam. The building is
-                        green and from 18th century.
-                      </p>
-                      <time className="reviews__time" dateTime="2019-04-24">
-                        April 2019
-                      </time>
-                    </div>
-                  </li>
-                </ul>
-                <CommentForm />
-              </section>
+              <ReviewsList reviews={reviews} />
             </div>
           </div>
-          <section className="offer__map map"></section>
+          <MapComponent offers={offers.slice(0, 3)} />
         </section>
         <div className="container">
           <div className="container">
@@ -222,11 +207,7 @@ const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
               <h2 className="near-places__title">
                 Other places in the neighbourhood
               </h2>
-              <div className="near-places__list places__list">
-                {offers.slice(0, 3).map((offer) => (
-                  <OfferCard key={offer.id} offer={offer} />
-                ))}
-              </div>
+              <NearOffersList offers={offers.slice(0, 3)} />
             </section>
           </div>
         </div>
