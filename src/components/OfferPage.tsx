@@ -2,7 +2,7 @@ import React from 'react';
 import { IOffer } from '../types';
 import ReviewsList from './ReviewsList';
 import MapComponent from './MapComponent';
-import NearOffersList from './NearOffersList';
+import NearbyOffersList from './NearbyOffersList';
 
 const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
   const reviews = [
@@ -207,7 +207,7 @@ const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
               <h2 className="near-places__title">
                 Other places in the neighbourhood
               </h2>
-              <NearOffersList offers={offers.slice(0, 3)} />
+              <NearbyOffersList offers={offers.slice(0, 3)} />
             </section>
           </div>
         </div>

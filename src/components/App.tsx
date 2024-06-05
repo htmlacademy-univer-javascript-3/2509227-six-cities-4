@@ -16,7 +16,7 @@ const App: FC<{ offers: IOffer[] }> = ({ offers }) => {
       <Routes>
         <Route
           path="/"
-          element={<HomePage offersCount={offers.length} offers={offers} />}
+          element={<HomePage />}
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/offer/:id" element={<OfferPage offers={offers} />} />

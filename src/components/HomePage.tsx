@@ -1,12 +1,54 @@
-import OfferCard from './OfferCard.tsx';
-import { FC } from 'react';
-import { IOffer } from '../types';
-import MapComponent from './MapComponent';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store';
+import { fetchOffers, setCity } from '../store/action';
+import CitiesList from '../components/CitiesList';
+import OfferCard from '../components/OfferCard';
+import MapComponent from '../components/MapComponent';
+import Spinner from '../components/Spinner';
+import ErrorMessage from '../components/ErrorMessage';
+import SortOptions from '../components/SortOptions';
 
-const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
-  offersCount,
-  offers,
-}) => {
+const HomePage: React.FC = () => {
+  const dispatch = useDispatch();
+  const city = useSelector((state: RootState) => state.rental.city);
+  const offers = useSelector((state: RootState) => state.rental.offers);
+  const sortType = useSelector((state: RootState) => state.rental.sortType);
+  const loading = useSelector((state: RootState) => state.rental.loading);
+  const error = useSelector((state: RootState) => state.rental.error);
+  const cityCoords = useSelector((state: RootState) => {
+    const selectedCity = offers.find(offer => offer.city.name === city)?.city.location;
+    return selectedCity ? [selectedCity.latitude, selectedCity.longitude] : [52.38333, 4.9];
+  });
+
+  useEffect(() => {
+    dispatch(fetchOffers());
+  }, [dispatch]);
+
+  const cityOffers = offers.filter(offer => offer.city.name === city);
+
+  const sortedOffers = [...cityOffers].sort((a, b) => {
+    switch (sortType) {
+      case 'Price: low to high':
+        return a.price - b.price;
+      case 'Price: high to low':
+        return b.price - a.price;
+      case 'Top rated first':
+        return b.rating - a.rating;
+      default:
+        return 0;
+    }
+  });
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
+
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -26,10 +68,7 @@ const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
             <nav className="header__nav">
               <ul className="header__nav-list">
                 <li className="header__nav-item user">
-                  <a
-                    className="header__nav-link header__nav-link--profile"
-                    href="#"
-                  >
+                  <a className="header__nav-link header__nav-link--profile" href="#">
                     <div className="header__avatar-wrapper user__avatar-wrapper"></div>
                     <span className="header__user-name user__name">
                       Oliver.conner@gmail.com
@@ -50,83 +89,23 @@ const HomePage: FC<{ offers: IOffer[]; offersCount: number }> = ({
 
       <main className="page__main page__main--index">
         <h1 className="visually-hidden">Cities</h1>
-        <div className="tabs">
-          <section className="locations container">
-            <ul className="locations__list tabs__list">
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Paris</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Cologne</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Brussels</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item tabs__item--active">
-                  <span>Amsterdam</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Hamburg</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Dusseldorf</span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <CitiesList />
         <div className="cities">
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
               <b className="places__found">
-                {offersCount} places to stay in Amsterdam
+                {sortedOffers.length} places to stay in {city}
               </b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by </span>
-                <span className="places__sorting-type" tabIndex={0}>
-                  Popular
-                  <svg className="places__sorting-arrow" width="7" height="4">
-                    <use href="#icon-arrow-select"></use>
-                  </svg>
-                </span>
-                <ul className="places__options places__options--custom places__options--opened">
-                  <li
-                    className="places__option places__option--active"
-                    tabIndex={0}
-                  >
-                    Popular
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                    Price: low to high
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                    Price: high to low
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                    Top rated first
-                  </li>
-                </ul>
-              </form>
+              <SortOptions />
               <div className="cities__places-list places__list tabs__content">
-                {offers.map((offer) => (
+                {sortedOffers.map((offer) => (
                   <OfferCard key={offer.id} offer={offer} />
                 ))}
               </div>
             </section>
             <div className="cities__right-section">
-              <MapComponent offers={offers} />
+              <MapComponent offers={sortedOffers} cityCoords={cityCoords}/>
             </div>
           </div>
         </div>
