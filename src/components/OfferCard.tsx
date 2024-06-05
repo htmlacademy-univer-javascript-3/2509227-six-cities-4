@@ -1,11 +1,16 @@
 import { FC } from "react";
 import { IOffer } from "../types";
 import { Link } from 'react-router-dom'; 
-
+import { useDispatch } from 'react-redux';
+import { highlightOffer } from '../store/action';
 
 const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
+  const dispatch = useDispatch();
+
   return (
-    <article className="cities__card place-card">
+    <article className="cities__card place-card" 
+        onMouseEnter={() => dispatch(highlightOffer(offer.id))}
+        onMouseLeave={() => dispatch(highlightOffer(null))}>
       {offer.isPremium && (
         <div className="place-card__mark">
           <span>Premium</span>
@@ -15,7 +20,7 @@ const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
         <Link to={`/offer/${offer.id}`}>
           <img
             className="place-card__image"
-            src={offer.image}
+            src={offer.previewImage}
             width="260"
             height="200"
             alt="Place image"
@@ -44,7 +49,7 @@ const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span style={{ width: `${offer.rating}%` }}></span>
+            <span style={{ width: `${offer.rating*20}%` }}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>
