@@ -1,12 +1,26 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+import Spinner from './Spinner';
 
-interface PrivateRouteProps {
-  isAuthenticated: boolean;
-}
+const PrivateRoute: React.FC = () => {
+  const authorizationStatus = useSelector(
+    (state: RootState) => state.rental.authorizationStatus
+  );
+  const authChecking = useSelector(
+    (state: RootState) => state.rental.authChecking
+  );
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated }) => (
-  isAuthenticated ? <Outlet /> : <Navigate to="/login" />
-);
+  if (authChecking) {
+    return <Spinner />;
+  }
+
+  if (authorizationStatus === 'NO_AUTH') {
+    return <Navigate to="/login" />;
+  }
+
+  return <Outlet />;
+};
 
 export default PrivateRoute;

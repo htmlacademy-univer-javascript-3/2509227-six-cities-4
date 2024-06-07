@@ -1,16 +1,32 @@
-import { FC } from "react";
-import { IOffer } from "../types";
-import { Link } from 'react-router-dom'; 
-import { useDispatch } from 'react-redux';
+import { FC } from 'react';
+import { IOffer } from '../types';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { highlightOffer } from '../store/action';
+import { toggleFavorite } from '../store/action';
+import { AppDispatch, RootState } from '../store';
 
-const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
-  const dispatch = useDispatch();
+const OfferCard: FC<{ offer: IOffer }> = ({ offer }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const authorizationStatus = useSelector((state: RootState) => state.rental.authorizationStatus);
+  const navigate = useNavigate();
+
+
+  const handleFavoriteToggle = () => {
+    if (authorizationStatus !== 'AUTH') {
+      navigate('/login');
+      return;
+    }
+    const status = offer.isFavorite ? 0 : 1;
+    dispatch(toggleFavorite({ offerId: offer.id, status }));
+  };
 
   return (
-    <article className="cities__card place-card" 
-        onMouseEnter={() => dispatch(highlightOffer(offer.id))}
-        onMouseLeave={() => dispatch(highlightOffer(null))}>
+    <article
+      className="cities__card place-card"
+      onMouseEnter={() => dispatch(highlightOffer(Number(offer.id)))}
+      onMouseLeave={() => dispatch(highlightOffer(null))}
+    >
       {offer.isPremium && (
         <div className="place-card__mark">
           <span>Premium</span>
@@ -35,21 +51,22 @@ const OfferCard:FC<{offer: IOffer}> = ({ offer }) => {
           </div>
           <button
             className={`place-card__bookmark-button button ${
-              offer.isBookmarked ? 'place-card__bookmark-button--active' : ''
+              offer.isFavorite ? 'place-card__bookmark-button--active' : ''
             }`}
             type="button"
+            onClick={handleFavoriteToggle}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use href="#icon-bookmark"></use>
             </svg>
             <span className="visually-hidden">
-              {offer.isBookmarked ? 'In bookmarks' : 'To bookmarks'}
+              {offer.isFavorite ? 'In bookmarks' : 'To bookmarks'}
             </span>
           </button>
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span style={{ width: `${offer.rating*20}%` }}></span>
+            <span style={{ width: `${offer.rating * 20}%` }}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>

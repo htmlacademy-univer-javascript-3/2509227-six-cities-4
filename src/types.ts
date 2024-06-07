@@ -22,6 +22,25 @@ export interface IOffer {
   };
 }
 
+export interface IUserInfo {
+  email: string;
+  avatarUrl: string;
+  token: string;
+}
+
+export interface IFullOffer extends IOffer {
+  description: string;
+  bedrooms: number;
+  goods: string[];
+  host: {
+    name: string;
+    avatarUrl: string;
+    isPro: boolean;
+  };
+  images: string[];
+  maxAdults: number;
+}
+
 export interface IRentalState {
   city: string;
   offers: IOffer[];
@@ -30,4 +49,23 @@ export interface IRentalState {
   highlightedOffer: number | null;
   loading: boolean;
   error: string | null;
+  authorizationStatus: 'NO_AUTH' | 'AUTH';
+  userInfo: IUserInfo | null;
+  currentOffer: IFullOffer | null;
+  nearbyOffers: IOffer[];
+  comments: IComment[];
+  favorites: IOffer[];
+  authChecking: boolean;
+}
+
+export interface IComment {
+  id: string;
+  date: string;
+  user: {
+    name: string;
+    avatarUrl: string;
+    isPro: boolean;
+  };
+  comment: string;
+  rating: number;
 }

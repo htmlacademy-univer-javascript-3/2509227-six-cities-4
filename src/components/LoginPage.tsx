@@ -1,4 +1,31 @@
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../store/action';
+import { RootState, AppDispatch } from '../store';
+
 const LoginPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const authorizationStatus = useSelector(
+    (state: RootState) => state.rental.authorizationStatus
+  );
+  const loginError = useSelector((state: RootState) => state.rental.error);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(login({ email, password }));
+  };
+
+  useEffect(() => {
+    if (authorizationStatus === 'AUTH') {
+      navigate('/');
+    }
+  }, [authorizationStatus, navigate]);
+
   return (
     <div className="page page--gray page--login">
       <header className="header">
@@ -18,12 +45,11 @@ const LoginPage = () => {
           </div>
         </div>
       </header>
-
       <main className="page__main page__main--login">
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post">
+            <form className="login__form form" onSubmit={handleSubmit}>
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">E-mail</label>
                 <input
@@ -32,6 +58,7 @@ const LoginPage = () => {
                   name="email"
                   placeholder="Email"
                   required={false}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="login__input-wrapper form__input-wrapper">
@@ -42,6 +69,7 @@ const LoginPage = () => {
                   name="password"
                   placeholder="Password"
                   required={false}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <button
@@ -50,6 +78,7 @@ const LoginPage = () => {
               >
                 Sign in
               </button>
+              {loginError && <p className="login__error">{loginError}</p>}
             </form>
           </section>
           <section className="locations locations--login locations--current">

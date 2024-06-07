@@ -9,6 +9,6 @@ const NotFoundPage: React.FC = () => {
       <Link to="/">На главную</Link>
     </div>
   );
-}
+};
 
 export default NotFoundPage;

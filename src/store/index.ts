@@ -6,7 +6,7 @@ const api = createAPI();
 
 export const store = configureStore({
   reducer: {
-    rental: rentalReducer
+    rental: rentalReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
