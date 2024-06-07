@@ -1,171 +1,159 @@
-import React from 'react';
-import { IOffer } from '../types';
-import ReviewsList from './ReviewsList';
-import MapComponent from './MapComponent';
-import NearbyOffersList from './NearbyOffersList';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  fetchOffer,
+  fetchNearbyOffers,
+  fetchComments,
+  postComment,
+  toggleFavorite,
+  fetchFavorites,
+} from '../store/action';
+import { RootState, AppDispatch } from '../store';
+import ReviewsList from '../components/ReviewsList';
+import MapComponent from '../components/MapComponent';
+import NearbyOffersList from '../components/NearbyOffersList';
+import Spinner from '../components/Spinner';
+import ErrorMessage from '../components/ErrorMessage';
+import Header from './Header';
+import { IFullOffer } from '../types';
 
-const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
-  const reviews = [
-    {
-      id: 1,
-      author: 'Max',
-      avatar: 'img/avatar-max.jpg',
-      rating: 4,
-      text: 'A quiet cozy and picturesque that hides behind a river by the unique lightness of Amsterdam.',
-      date: '2019-04-24',
-      displayDate: 'April 2019',
-    },
-    {
-      id: 2,
-      author: 'Max',
-      avatar: 'img/avatar-max.jpg',
-      rating: 5,
-      text: 'A quiet cozy and picturesque that hides behind a river by the unique lightness of Amsterdam.',
-      date: '2019-05-24',
-      displayDate: 'May 2019',
-    },
-  ];
+const OfferPage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const currentOffer = useSelector(
+    (state: RootState) => state.rental.currentOffer as IFullOffer | null
+  );
+  const comments = useSelector((state: RootState) => state.rental.comments);
+  const loading = useSelector((state: RootState) => state.rental.loading);
+  const error = useSelector((state: RootState) => state.rental.error);
+  const nearbyOffers = useSelector(
+    (state: RootState) => state.rental.nearbyOffers
+  );
+  const authorizationStatus = useSelector(
+    (state: RootState) => state.rental.authorizationStatus
+  );
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchOffer(id));
+      dispatch(fetchNearbyOffers(id));
+      dispatch(fetchComments(id));
+      dispatch(fetchFavorites());
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (error) {
+      navigate('/404');
+    }
+  }, [error, navigate]);
+
+  if (loading || !currentOffer) {
+    return <Spinner />;
+  }
+
+  if (!currentOffer) {
+    return <ErrorMessage message="Offer not found" />;
+  }
+
+  const handleCommentSubmit = (comment: string, rating: number) => {
+    if (id) {
+      dispatch(postComment({ offerId: id, comment, rating }));
+    }
+  };
+
+  const handleFavoriteToggle = () => {
+    if (authorizationStatus !== 'AUTH') {
+      navigate('/login');
+      return;
+    }
+    if (id) {
+      const status = currentOffer.isFavorite ? 0 : 1;
+      dispatch(toggleFavorite({ offerId: id, status }));
+    }
+  };
+
+  const reviews = Array.isArray(comments) ? comments : [];
+  const nearbyOffersToShow = nearbyOffers.slice(0, 3);
 
   return (
     <div className="page">
-      <header className="header">
-        <div className="container">
-          <div className="header__wrapper">
-            <div className="header__left">
-              <a className="header__logo-link" href="main.html">
-                <img
-                  className="header__logo"
-                  src="img/logo.svg"
-                  alt="6 cities logo"
-                  width="81"
-                  height="41"
-                />
-              </a>
-            </div>
-            <nav className="header__nav">
-              <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a
-                    className="header__nav-link header__nav-link--profile"
-                    href="#"
-                  >
-                    <div className="header__avatar-wrapper user__avatar-wrapper"></div>
-                    <span className="header__user-name user__name">
-                      Oliver.conner@gmail.com
-                    </span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+      <Header />
       <main className="page__main page__main--offer">
         <section className="offer">
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/room.jpg"
-                  alt="Photo studio"
-                />
-              </div>
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/apartment-01.jpg"
-                  alt="Photo studio"
-                />
-              </div>
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/apartment-02.jpg"
-                  alt="Photo studio"
-                />
-              </div>
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/apartment-03.jpg"
-                  alt="Photo studio"
-                />
-              </div>
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/studio-01.jpg"
-                  alt="Photo studio"
-                />
-              </div>
-              <div className="offer__image-wrapper">
-                <img
-                  className="offer__image"
-                  src="img/apartment-01.jpg"
-                  alt="Photo studio"
-                />
-              </div>
+              {currentOffer.images.map((image, index) => (
+                <div className="offer__image-wrapper" key={index}>
+                  <img
+                    className="offer__image"
+                    src={image}
+                    alt={`Photo studio ${index + 1}`}
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <div className="offer__container container">
             <div className="offer__wrapper">
-              <div className="offer__mark">
-                <span>Premium</span>
-              </div>
+              {currentOffer.isPremium && (
+                <div className="offer__mark">
+                  <span>Premium</span>
+                </div>
+              )}
               <div className="offer__name-wrapper">
-                <h1 className="offer__name">
-                  Beautiful &amp; luxurious studio at great location
-                </h1>
-                <button className="offer__bookmark-button button" type="button">
+                <h1 className="offer__name">{currentOffer.title}</h1>
+                <button
+                  className={`offer__bookmark-button button ${
+                    currentOffer.isFavorite
+                      ? 'offer__bookmark-button--active'
+                      : ''
+                  }`}
+                  type="button"
+                  onClick={handleFavoriteToggle}
+                >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use href="#icon-bookmark"></use>
                   </svg>
-                  <span className="visually-hidden">To bookmarks</span>
+                  <span className="visually-hidden">
+                    {currentOffer.isFavorite ? 'In bookmarks' : 'To bookmarks'}
+                  </span>
                 </button>
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
-                  <span style={{ width: '80%' }}></span>
+                  <span style={{ width: `${currentOffer.rating * 20}%` }} />
                   <span className="visually-hidden">Rating</span>
                 </div>
-                <span className="offer__rating-value rating__value">4.8</span>
+                <span className="offer__rating-value rating__value">
+                  {currentOffer.rating}
+                </span>
               </div>
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
-                  Apartment
+                  {currentOffer.type}
                 </li>
                 <li className="offer__feature offer__feature--bedrooms">
-                  3 Bedrooms
+                  {currentOffer.bedrooms} Bedrooms
                 </li>
                 <li className="offer__feature offer__feature--adults">
-                  Max 4 adults
+                  Max {currentOffer.maxAdults} adults
                 </li>
               </ul>
               <div className="offer__price">
-                <b className="offer__price-value">&euro;120</b>
+                <b className="offer__price-value">&euro;{currentOffer.price}</b>
                 <span className="offer__price-text">&nbsp;night</span>
               </div>
               <div className="offer__inside">
                 <h2 className="offer__inside-title">What&apos;s inside</h2>
                 <ul className="offer__inside-list">
-                  <li className="offer__inside-item">Wi-Fi</li>
-                  <li className="offer__inside-item">Washing machine</li>
-                  <li className="offer__inside-item">Towels</li>
-                  <li className="offer__inside-item">Heating</li>
-                  <li className="offer__inside-item">Coffee machine</li>
-                  <li className="offer__inside-item">Baby seat</li>
-                  <li className="offer__inside-item">Kitchen</li>
-                  <li className="offer__inside-item">Dishwasher</li>
-                  <li className="offer__inside-item">Cabel TV</li>
-                  <li className="offer__inside-item">Fridge</li>
+                  {currentOffer.goods.map((good, index) => (
+                    <li className="offer__inside-item" key={index}>
+                      {good}
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className="offer__host">
@@ -174,32 +162,37 @@ const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
                   <div className="offer__avatar-wrapper offer__avatar-wrapper--pro user__avatar-wrapper">
                     <img
                       className="offer__avatar user__avatar"
-                      src="img/avatar-angelina.jpg"
+                      src={currentOffer.host.avatarUrl}
                       width="74"
                       height="74"
                       alt="Host avatar"
                     />
                   </div>
-                  <span className="offer__user-name">Angelina</span>
-                  <span className="offer__user-status">Pro</span>
+                  <span className="offer__user-name">
+                    {currentOffer.host.name}
+                  </span>
+                  {currentOffer.host.isPro && (
+                    <span className="offer__user-status">Pro</span>
+                  )}
                 </div>
                 <div className="offer__description">
-                  <p className="offer__text">
-                    A quiet cozy and picturesque that hides behind a a river by
-                    the unique lightness of Amsterdam. The building is green and
-                    from 18th century.
-                  </p>
-                  <p className="offer__text">
-                    An independent House, strategically located between Rembrand
-                    Square and National Opera, but where the bustle of the city
-                    comes to rest in this alley flowery and colorful.
-                  </p>
+                  <p className="offer__text">{currentOffer.description}</p>
                 </div>
               </div>
-              <ReviewsList reviews={reviews} />
+              <ReviewsList
+                reviews={reviews}
+                onCommentSubmit={handleCommentSubmit}
+                authorizationStatus={authorizationStatus}
+              />
             </div>
           </div>
-          <MapComponent offers={offers.slice(0, 3)} />
+          <MapComponent
+            offers={nearbyOffersToShow.concat(currentOffer)}
+            cityCoords={[
+              currentOffer.city.location.latitude,
+              currentOffer.city.location.longitude,
+            ]}
+          />
         </section>
         <div className="container">
           <div className="container">
@@ -207,7 +200,7 @@ const OfferPage: React.FC<{ offers: IOffer[] }> = ({ offers }) => {
               <h2 className="near-places__title">
                 Other places in the neighbourhood
               </h2>
-              <NearbyOffersList offers={offers.slice(0, 3)} />
+              <NearbyOffersList offers={nearbyOffersToShow} />
             </section>
           </div>
         </div>

@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store';
+import { postComment } from '../store/action';
+import { useParams } from 'react-router-dom';
 
-const CommentForm = () => {
-  const [review, setReview] = useState('');
+const CommentForm:React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { id } = useParams<{ id: string }>();
+  const [comment, setComment] = useState('');
   const [rating, setRating] = useState(0);
+  const authorizationStatus = useSelector((state: RootState) => state.rental.authorizationStatus);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log({ rating, review });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (authorizationStatus === 'AUTH' && id) {
+      dispatch(postComment({ offerId: id, comment, rating }));
+      setComment('');
+      setRating(0);
+    }
   };
 
   return (
@@ -43,9 +54,9 @@ const CommentForm = () => {
         id="review"
         name="review"
         placeholder="Tell how was your stay, what you like and what can be improved"
-        value={review}
-        onChange={(e) => setReview(e.target.value)}
-      ></textarea>
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
       <div className="reviews__button-wrapper">
         <p className="reviews__help">
           To submit review please make sure to set{' '}
@@ -55,7 +66,7 @@ const CommentForm = () => {
         <button
           className="reviews__submit form__submit button"
           type="submit"
-          disabled={review.length < 50 || rating === 0}
+          disabled={comment.length < 50 || rating === 0}
         >
           Submit
         </button>
